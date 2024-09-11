@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes e Produtos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 601px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cadastro de Clientes e Produtos</h1>
+    <div>
+        <h2>Cliente</h2>
+        <label for="clientName">Nome do Cliente:</label>
+        <input type="text" id="clientName" required>
+        
+        <button onclick="addClient()">Adicionar Cliente</button>
+    </div>
+
+    <div>
+        <h2>Produto</h2>
+        <label for="productName">Nome do Produto:</label>
+        <input type="text" id="productName" required>
+        
+        <button onclick="addProduct()">Adicionar Produto</button>
+    </div>
+
+    <h2>Lista de Clientes</h2>
+    <table id="clientsTable">
+        <thead>
+            <tr>
+                <th>Nome do Cliente</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>Lista de Produtos</h2>
+    <table id="productsTable">
+        <thead>
+            <tr>
+                <th>Nome do Produto</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    
+    const firebaseConfig = {
+        apiKey: "cadstro_API_KEY",
+        authDomain: "cadastro_PROJETO.firebaseapp.com",
+        projectId: "cadastro_PROJETO_ID",
+        storageBucket: "cadstro_PROJETO.appspot.com",
+        messagingSenderId: "cadstro_SENDER_ID",
+        appId: "CDS_APP_ID"
+    };
+
+    
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function addClient() {
+        const clientName = document.getElementById('clientName').value;
+        if (clientName) {
+            db.collection("clients").add({ name: clientName })
+                .then(() => {
+                    document.getElementById('clientName').value = '';
+                    loadClients();
+                });
+        }
+    }
+
+    function addProduct() {
+        const productName = document.getElementById('productName').value;
+        if (productName) {
+            db.collection("products").add({ name: productName })
+                .then(() => {
+                    document.getElementById('productName').value = '';
+                    loadProducts();
+                });
+        }
+    }
+
+    function loadClients() {
+        db.collection("clients").get().then((querySnapshot) => {
+            const table = document.getElementById('clientsTable').getElementsByTagName('tbody')[0];
+            table.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const newRow = table.insertRow();
+                const newCell = newRow.insertCell(0);
+                newCell.textContent = doc.data().name;
+            });
+        });
+    }
+
+    function loadProducts() {
+        db.collection("products").get().then((querySnapshot) => {
+            const table = document.getElementById('productsTable').getElementsByTagName('tbody')[0];
+            table.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const newRow = table.insertRow();
+                const newCell = newRow.insertCell(0);
+                newCell.textContent = doc.data().name;
+            });
+        });
+    }
+
+   
+    loadClients();
+    loadProducts();
+</script>
+
+</body>
+</html>
